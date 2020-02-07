@@ -467,7 +467,7 @@ enum gps_msg lgw_parse_ubx(const char *serial_buff, size_t buff_size, size_t *ms
                         gps_tAcc_ns |= (uint8_t)serial_buff[19] << 8; /* GPS time accuracy */
 
                         gps_time_ok = true;
-#if 0
+#if 1
                         /* For debug */
                         {
                             short ubx_gps_hou = 0; /* hours (0-23) */
@@ -478,7 +478,7 @@ enum gps_msg lgw_parse_ubx(const char *serial_buff, size_t buff_size, size_t *ms
                             ubx_gps_sec = (gps_iTOW / 1000) % 60;
                             ubx_gps_min = (gps_iTOW / 1000 / 60) % 60;
                             ubx_gps_hou = (gps_iTOW / 1000 / 60 / 60) % 24;
-                            printf("  GPS time = %02d:%02d:%02d\n", ubx_gps_hou, ubx_gps_min, ubx_gps_sec);
+                            DEBUG_MSG("  GPS time = %02d:%02d:%02d\n", ubx_gps_hou, ubx_gps_min, ubx_gps_sec);
                         }
 #endif
                     } else { /* valid */
@@ -600,7 +600,6 @@ enum gps_msg lgw_parse_nmea(const char *serial_buff, int buff_size) {
         }
         return NMEA_GGA;
     } else {
-        DEBUG_MSG("Note: ignored NMEA sentence\n"); /* quite verbose */
         return IGNORED;
     }
 }
