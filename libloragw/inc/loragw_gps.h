@@ -42,6 +42,7 @@ struct tref {
     uint32_t        count_us;   /*!> reference concentrator internal timestamp */
     struct timespec utc;        /*!> reference UTC time (from GPS/NMEA) */
     struct timespec gps;        /*!> reference GPS time (since 01.Jan.1980) */
+    struct timespec gps_acc;    /*!> GPS time accuracy (only ns) */
     double          xtal_err;   /*!> raw clock error (eg. <1 'slow' XTAL) */
 };
 
@@ -149,6 +150,7 @@ enum gps_msg lgw_parse_ubx(const char* serial_buff, size_t buff_size, size_t *ms
 
 @param utc pointer to store UTC time, with ns precision (NULL to ignore)
 @param gps_time pointer to store GPS time, with ns precision (NULL to ignore)
+@param gps_time_acc pointer to store GPS time accuracy, with ns precision (NULL to ignore)
 @param loc pointer to store coordinates (NULL to ignore)
 @param err pointer to store coordinates standard deviation (NULL to ignore)
 @return success if the chosen elements could be returned
@@ -159,7 +161,7 @@ format that is exploitable by other functions in that library sub-module.
 If the lgw_parse_nmea/lgw_parse_ubx and lgw_gps_get are used in different
 threads, a mutex lock must be acquired before calling either function.
 */
-int lgw_gps_get(struct timespec *utc, struct timespec *gps_time, struct coord_s *loc, struct coord_s *err);
+int lgw_gps_get(struct timespec *utc, struct timespec *gps_time, struct timespec * gps_time_acc, struct coord_s *loc, struct coord_s *err);
 
 /**
 @brief Get time and position information from the serial GPS last message received

@@ -75,6 +75,7 @@ static bool gps_time_ok = false;
 static int16_t gps_week = 0; /* GPS week number of the navigation epoch */
 static uint32_t gps_iTOW = 0; /* GPS time of week in milliseconds */
 static int32_t gps_fTOW = 0; /* Fractional part of iTOW (+/-500000) in nanosec */
+static uint16_t gps_tAcc_ns = 0; /* Time Accuracy Estimate in nanosec */
 
 static short gps_dla = 0; /* degrees of latitude */
 static double gps_mla = 0.0; /* minutes of latitude */
@@ -457,6 +458,14 @@ enum gps_msg lgw_parse_ubx(const char *serial_buff, size_t buff_size, size_t *ms
                         gps_week =  (uint8_t)serial_buff[14];
                         gps_week |= (uint8_t)serial_buff[15] << 8; /* GPS week number */
 
+                        /* Skipping:
+                         * - leapS (1 byte)
+                         * - valid (1 byte)
+                         */
+
+                        gps_tAcc_ns  = (uint8_t)serial_buff[18];
+                        gps_tAcc_ns |= (uint8_t)serial_buff[19] << 8; /* GPS time accuracy */
+
                         gps_time_ok = true;
 #if 0
                         /* For debug */
@@ -598,7 +607,7 @@ enum gps_msg lgw_parse_nmea(const char *serial_buff, int buff_size) {
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-int lgw_gps_get(struct timespec *utc, struct timespec *gps_time, struct coord_s *loc, struct coord_s *err) {
+int lgw_gps_get(struct timespec *utc, struct timespec *gps_time, struct timespec * gps_time_acc, struct coord_s *loc, struct coord_s *err) {
     struct tm x;
     time_t y;
     double intpart, fractpart;
@@ -639,6 +648,10 @@ int lgw_gps_get(struct timespec *utc, struct timespec *gps_time, struct coord_s 
         gps_time->tv_sec += (time_t)gps_week * 604800; /* day*hours*minutes*secondes: 7*24*60*60; */
         /* Fractional part in nanoseconds */
         gps_time->tv_nsec = (long)(fractpart * 1E9);
+    }
+    if (gps_time_acc != NULL) {
+        gps_time_acc->tv_sec = 0;
+        gps_time_acc->tv_nsec = gps_tAcc_ns;
     }
     if (loc != NULL) {
         if (!gps_pos_ok) {

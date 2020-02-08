@@ -73,7 +73,7 @@ static void gps_process_sync(void) {
     struct timespec y;
 
     /* get GPS time for synchronization */
-    int i = lgw_gps_get(&ppm_utc, &ppm_gps, NULL, NULL);
+    int i = lgw_gps_get(&ppm_utc, &ppm_gps, NULL, NULL, NULL);
     if (i != LGW_GPS_SUCCESS) {
         printf("    No valid reference GPS time available, synchronization impossible.\n");
         return;
@@ -119,7 +119,7 @@ static void gps_process_coords(void) {
     /* position variable */
     struct coord_s coord;
     struct coord_s gpserr;
-    int    i = lgw_gps_get(NULL, NULL, &coord, &gpserr);
+    int    i = lgw_gps_get(NULL, NULL, NULL, &coord, &gpserr);
 
     /* update gateway coordinates */
     if (i == LGW_GPS_SUCCESS) {
